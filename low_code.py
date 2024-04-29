@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.datasets import load_iris, load_digits, load_wine, load_diabetes
-
- global problem_type = None
+from utils import problem_typeD, categorical_columns
+global problem_type
 
 def getdata(name):
     if name.lower() == 'iris':
@@ -30,17 +30,13 @@ def getdata(name):
         return pd.read_excel(name)
     else:
         return None
-def setup(data,target,session_id):
+def setup(data, target, session_id):
 
-    num_unique_values = len(data[target].unique())
-    if num_unique_values == 2:
-        problem_type = "Binary"
-    elif num_unique_values > 2 and num_unique_values < 10 :
-        problem_type = "MultiClass"
-    else:
-        problem_type = "Regression"
-
+    problem_type = problem_typeD(data, target)
+    catgCol = categorical_columns(data)
+    print(catgCol)
     setup_info = {"Descrption":["session_id", "Target","Target type", "Original data shape"],
                   "Value":[session_id, target, problem_type, data.shape]}
     df = pd.DataFrame(setup_info)
+
     return df
