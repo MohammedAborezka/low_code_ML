@@ -30,11 +30,13 @@ def categorical_columns(data):
             numericCol.append(column)
     numericCol.extend(numeric_columns_float)
     return catgCol, strCol, numericCol
+
+
 def columns_with_null_values(data):
-    # Check for null values in each column
+    data_types = data.dtypes
+    object_columns = data_types[(data_types == 'object') | (data_types == 'bool')].index.tolist()
+    numeric_columns = data_types[(data_types == 'int32') |(data_types == 'float64')].index.tolist()
+
     null_columns = data.isnull().any()
-
-    # Filter to get the names of columns with null values
     columns_with_null = null_columns[null_columns].index.tolist()
-
     return columns_with_null

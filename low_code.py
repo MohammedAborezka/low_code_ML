@@ -1,7 +1,8 @@
 import pandas as pd
 from sklearn.datasets import load_iris, load_digits, load_wine, load_diabetes
-from utils import problem_typeD, categorical_columns
-global problem_type
+from utils import problem_typeD, categorical_columns,columns_with_null_values
+from sklearn.model_selection import train_test_split
+
 
 def getdata(name):
     if name.lower() == 'iris':
@@ -30,13 +31,35 @@ def getdata(name):
         return pd.read_excel(name)
     else:
         return None
-def setup(data, target, session_id):
 
-    problem_type = problem_typeD(data, target)
-    catgCol = categorical_columns(data)
-    print(catgCol)
-    setup_info = {"Descrption":["session_id", "Target","Target type", "Original data shape"],
-                  "Value":[session_id, target, problem_type, data.shape]}
-    df = pd.DataFrame(setup_info)
 
-    return df
+class Expermint():
+    def __init__(self):
+        self.data = None
+        self.problem_type = None
+        self.shape = None
+        self.tshape = None
+        self.X_test = None
+        self.X_train = None
+        self.y_train = None
+        self.y_test = None
+
+    def setup(self, data, target, session_id):
+        self.data = data
+        self.problem_type = problem_typeD(data, target)
+        catgCol, strCol, numCol = categorical_columns(self.data)
+        self.shape = self.data.shape
+        if len(catgCol) != 0:
+            self.data = pd.get_dummies(self.data, columns=catgCol, drop_first=True)
+        print(catgCol, strCol, numCol)
+        self.tshape = self.data.shape
+        x = self.data.drop(target, axis=1).values
+        y = self.data[target]
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(x, y, test_size=0.2)
+        null_col = columns_with_null_values(self.data)
+        setup_info = {
+            "Description": ["session_id", "Target", "Target type", "Original data shape", "Transformed data shape"],
+            "Value": [session_id, target, self.problem_type, self.shape, self.tshape]}
+        df = pd.DataFrame(setup_info)
+
+        return df
