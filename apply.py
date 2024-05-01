@@ -1,6 +1,6 @@
 import streamlit as st
 from low_code import getdata,Expermint
-x = getdata("wine")
+x = getdata("mushroom_cleaned.csv")
 e =Expermint()
-y = e.setup(x, target="wine", session_id=123)
+y = e.setup(x, target="class", session_id=123)
 print(y)
